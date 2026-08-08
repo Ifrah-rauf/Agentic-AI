@@ -61,6 +61,7 @@ messages = [
 ---
 
 ## 2. LiteLLM
+<img src="static/s1.png"></img>
 
 A unified client interface across LLM providers — same function call shape regardless of vendor.
 
@@ -97,6 +98,7 @@ Used for cost estimation, usage monitoring, debugging, and token optimization.
 
 ## 3. LangChain vs LiteLLM
 
+
 **LiteLLM** — abstracts model/API access only.
 ```
 Your Code → LiteLLM → LLM Provider
@@ -121,6 +123,8 @@ Application → LangChain → LiteLLM → LLM Provider
 ---
 
 ## 4. Tokens, Usage & API Cost
+
+<img src="static/s2.png"></img>
 
 A model never sees raw words — text is tokenized first.
 
@@ -166,6 +170,7 @@ for token_id in tokens:
 Measured in tokens, not characters or words. Exceeding it either truncates silently (bad) or throws an error, depending on the API — always check remaining budget before appending large tool results or documents.
 
 ---
+<img src="static/s3.png"></img>
 
 ## 5. Prompt Caching
 
@@ -222,6 +227,8 @@ LLM + Search + Tools + Memory + External Data
 
 ## 7. Gradio
 
+<img src="static/s4.png"></img>
+
 A Python library for turning a function into a web UI with minimal code — no separate frontend needed.
 
 ```python
@@ -266,6 +273,8 @@ The model still generates token-by-token internally either way — streaming onl
 ---
 
 ## 9. Tool Calling
+
+<img src="static/s5.png"></img>
 
 Lets a model request that an external function be run, instead of trying to answer from parameters alone.
 
@@ -321,6 +330,9 @@ User → LLM → Tool needed?
               └─ Yes → Tool Request → App → Execute → Result → LLM → Answer
 ```
 
+
+<img src="static/s6.png"></img>
+
 ---
 
 ## 11. Multiple Tool Calls
@@ -345,6 +357,9 @@ User: "Find the cheapest flight to Tokyo and today's weather there."
 ```
 
 Your app should execute all requested calls (often in parallel, since they're usually independent) and append each result with its own `tool_call_id` before sending the next request — mismatched IDs are a common source of bugs in multi-tool flows.
+
+<img src="static/s8.png"></img>
+<img src="static/s9.png"></img>
 
 ---
 
@@ -375,6 +390,9 @@ LLM → Tool Schema → Tool Call Request → Your Backend → Actual Code → R
 ---
 
 ## 13. Agentic AI
+
+<img src="static/s7.png"></img>
+
 
 **Definition:** a system where the LLM decides what action to take next, observes the result, and decides the next action — repeated until the goal is met.
 
@@ -467,7 +485,7 @@ In production, also log every tool call/result pair — agent loops are hard to 
 
 ---
 
-## 16. Quick Revision
+## 16. Summary
 
 | Concept | Remember |
 |---|---|
@@ -507,7 +525,3 @@ In production, also log every tool call/result pair — agent loops are hard to 
                          │
                    Final Result
 ```
-
----
-
-**Next:** RAG → Embeddings → Vector Databases → Retrieval
