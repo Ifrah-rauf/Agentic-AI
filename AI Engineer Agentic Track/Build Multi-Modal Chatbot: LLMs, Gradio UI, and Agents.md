@@ -1,6 +1,8 @@
 # LLM Application Development
 
 APIs · LiteLLM · LangChain · Gradio · Tool Calling · Agentic AI
+<br>
+Note: There are screenshots of the notes I created from the course.
 
 ## Contents
 
@@ -25,13 +27,13 @@ APIs · LiteLLM · LangChain · Gradio · Tool Calling · Agentic AI
 
 ## 1. LLM API Fundamentals
 
-An application talks to a model over HTTP — send a request, get a response back. There's no persistent connection or session on the model's side.
+An application talks to a model over HTTP - send a request, get a response back. There's no persistent connection or session on the model's side.
 
 **Request typically contains:**
-- `model` — which model to call
-- `messages` — the conversation so far
-- `parameters` — temperature, max_tokens, top_p, etc.
-- `tools` — optional function schemas the model can call
+- `model` - which model to call
+- `messages` - the conversation so far
+- `parameters` - temperature, max_tokens, top_p, etc.
+- `tools` - optional function schemas the model can call
 
 ```python
 response = client.chat.completions.create(
@@ -40,7 +42,7 @@ response = client.chat.completions.create(
 )
 ```
 
-**Messages** — a conversation is an ordered list of role-tagged turns:
+**Messages** - a conversation is an ordered list of role-tagged turns:
 
 ```python
 messages = [
@@ -51,19 +53,21 @@ messages = [
 
 | Role | Purpose |
 |---|---|
-| `system` | Sets behavior/instructions — highest-priority guidance |
+| `system` | Sets behavior/instructions - highest-priority guidance |
 | `user` | End-user input |
 | `assistant` | Model's prior response (sent back for context) |
 | `tool` | Result returned by a tool call |
 
-**Stateless by default.** The model has no memory of Call 1 when Call 2 arrives — each request is self-contained. "Memory" in an LLM app is not a model feature; it's application logic that re-sends the growing message history on every call. This has a direct cost implication: a long conversation resends the entire history every turn, so token usage (and cost) grows with conversation length unless you truncate, summarize, or use RAG to compress older context.
+**Stateless by default.** The model has no memory of Call 1 when Call 2 arrives - each request is self-contained. "Memory" in an LLM app is not a model feature; it's application logic that re-sends the growing message history on every call. This has a direct cost implication: a long conversation resends the entire history every turn, so token usage (and cost) grows with conversation length unless you truncate, summarize, or use RAG to compress older context.
 
 ---
 
 ## 2. LiteLLM
-<img src="static/s1.png"></img>
+<p align="center">
+  <img src="static/s1.png" alt="note">
+</p>
 
-A unified client interface across LLM providers — same function call shape regardless of vendor.
+A unified client interface across LLM providers - same function call shape regardless of vendor.
 
 ```python
 from litellm import completion
@@ -92,20 +96,20 @@ response.usage.total_tokens
 
 Used for cost estimation, usage monitoring, debugging, and token optimization.
 
-**Why it matters:** without an abstraction layer, switching or A/B-testing providers means rewriting SDK-specific code (OpenAI SDK vs Anthropic SDK vs Gemini SDK) throughout the app. LiteLLM also supports model routing (e.g., fallback to a secondary model on failure/rate-limit) and cost tracking across providers in one place — useful once an app calls more than one model.
+**Why it matters:** without an abstraction layer, switching or A/B-testing providers means rewriting SDK-specific code (OpenAI SDK vs Anthropic SDK vs Gemini SDK) throughout the app. LiteLLM also supports model routing (e.g., fallback to a secondary model on failure/rate-limit) and cost tracking across providers in one place - useful once an app calls more than one model.
 
 ---
 
 ## 3. LangChain vs LiteLLM
 
 
-**LiteLLM** — abstracts model/API access only.
+**LiteLLM** - abstracts model/API access only.
 ```
 Your Code → LiteLLM → LLM Provider
 ```
 Good for: unified API, provider switching, routing, usage stats.
 
-**LangChain** — a full framework for building LLM applications on top of a model.
+**LangChain** - a full framework for building LLM applications on top of a model.
 ```
 Application → LangChain → { LLM · RAG · Tools · Agents }
 ```
@@ -123,16 +127,17 @@ Application → LangChain → LiteLLM → LLM Provider
 ---
 
 ## 4. Tokens, Usage & API Cost
-
+<p align="center">
 <img src="static/s2.png"></img>
+</p>
 
-A model never sees raw words — text is tokenized first.
+A model never sees raw words - text is tokenized first.
 
 ```
 "Hello world" → Tokenizer → [token_1, token_2]
 ```
 
-A token can be a whole word, part of a word, punctuation, or a whitespace pattern. Token boundaries are language- and tokenizer-specific — this is why non-English text or code often consumes more tokens per "word" than English prose.
+A token can be a whole word, part of a word, punctuation, or a whitespace pattern. Token boundaries are language- and tokenizer-specific - this is why non-English text or code often consumes more tokens per "word" than English prose.
 
 **Three counts that matter:**
 
@@ -142,7 +147,7 @@ response.usage.completion_tokens   # generated by the model
 response.usage.total_tokens        # prompt + completion
 ```
 
-**Why tokens matter:** they determine context usage, API cost (input and output tokens are usually billed at different rates — output is typically pricier), and latency (longer generations take longer, roughly linearly with completion tokens).
+**Why tokens matter:** they determine context usage, API cost (input and output tokens are usually billed at different rates - output is typically pricier), and latency (longer generations take longer, roughly linearly with completion tokens).
 
 **Tokenizing directly:**
 
@@ -156,7 +161,7 @@ for token_id in tokens:
     print(token_id, encoding.decode([token_id]))
 ```
 
-**Context window** — the maximum tokens (input + output combined) a single request can hold:
+**Context window** - the maximum tokens (input + output combined) a single request can hold:
 
 ```
 ┌ System Prompt ┐
@@ -167,10 +172,12 @@ for token_id in tokens:
 └────────────────┘
 ```
 
-Measured in tokens, not characters or words. Exceeding it either truncates silently (bad) or throws an error, depending on the API — always check remaining budget before appending large tool results or documents.
+Measured in tokens, not characters or words. Exceeding it either truncates silently (bad) or throws an error, depending on the API - always check remaining budget before appending large tool results or documents.
 
 ---
+<p align="center">
 <img src="static/s3.png"></img>
+</p>
 
 ## 5. Prompt Caching
 
@@ -187,7 +194,7 @@ Request 2:  Same Static Context → Cache hit → Lower cost, lower latency
 response.usage.prompt_tokens_details.cached_tokens
 ```
 
-**Ordering rule:** put stable content first, volatile content last — a cache is normally matched as a prefix, so anything that changes at the *start* of the prompt (like a timestamp) invalidates the cache for everything after it.
+**Ordering rule:** put stable content first, volatile content last - a cache is normally matched as a prefix, so anything that changes at the *start* of the prompt (like a timestamp) invalidates the cache for everything after it.
 
 ```
 Bad:                          Good:
@@ -196,10 +203,10 @@ Static instructions...        Static documentation...
 Static documentation...       Current time: 10:31
 ```
 
-**Provider differences** (mechanism, not just pricing — check current docs before relying on specifics):
-- OpenAI — automatic caching where supported, no code changes needed
-- Anthropic — explicit cache-control breakpoints you set in the request; caches typically apply above a minimum block size
-- Gemini — implicit and/or explicit caching depending on the API surface used
+**Provider differences** (mechanism, not just pricing - check current docs before relying on specifics):
+- OpenAI - automatic caching where supported, no code changes needed
+- Anthropic - explicit cache-control breakpoints you set in the request; caches typically apply above a minimum block size
+- Gemini - implicit and/or explicit caching depending on the API surface used
 
 Caching is most valuable in RAG apps, coding assistants with large repo context, and any system reusing a big fixed instruction block across many calls.
 
@@ -221,15 +228,16 @@ A product wraps the model with capabilities the model doesn't have on its own:
 LLM + Search + Tools + Memory + External Data
 ```
 
-**Why this matters practically:** `Model ≠ AI Product`. A model's raw knowledge is frozen at training time; a product stays current by bolting on retrieval, tools, and memory around it — none of which require retraining the base model. When evaluating "is this model good," separate what's the base model's capability from what's the surrounding product engineering.
+**Why this matters practically:** `Model ≠ AI Product`. A model's raw knowledge is frozen at training time; a product stays current by bolting on retrieval, tools, and memory around it - none of which require retraining the base model. When evaluating "is this model good," separate what's the base model's capability from what's the surrounding product engineering.
 
 ---
 
 ## 7. Gradio
-
+<p align="center">
 <img src="static/s4.png"></img>
+</p>
 
-A Python library for turning a function into a web UI with minimal code — no separate frontend needed.
+A Python library for turning a function into a web UI with minimal code - no separate frontend needed.
 
 ```python
 import gradio as gr
@@ -247,7 +255,7 @@ Good for prototypes, model testing, demos, and quick sharing.
 ```python
 demo.launch(share=True)   # → https://xxxxx.gradio.live
 ```
-This opens a temporary public tunnel to your locally running app. It is a **sharing mechanism, not a deployment mechanism** — the link expires and depends on your machine staying online; for production use a real hosting setup (e.g., Spaces, a container, a cloud VM).
+This opens a temporary public tunnel to your locally running app. It is a **sharing mechanism, not a deployment mechanism** - the link expires and depends on your machine staying online; for production use a real hosting setup (e.g., Spaces, a container, a cloud VM).
 
 ---
 
@@ -268,13 +276,14 @@ for chunk in stream:
     print(chunk)
 ```
 
-The model still generates token-by-token internally either way — streaming only changes *when* the client is shown each piece. This matters for perceived latency (users see progress immediately instead of a blank wait) and for UX patterns like stop-generation buttons. It complicates client code slightly: you need to accumulate chunks, handle partial JSON if streaming structured/tool-call output, and handle stream interruption/errors mid-response.
+The model still generates token-by-token internally either way - streaming only changes *when* the client is shown each piece. This matters for perceived latency (users see progress immediately instead of a blank wait) and for UX patterns like stop-generation buttons. It complicates client code slightly: you need to accumulate chunks, handle partial JSON if streaming structured/tool-call output, and handle stream interruption/errors mid-response.
 
 ---
 
 ## 9. Tool Calling
-
+<p align="center">
 <img src="static/s5.png"></img>
+</p>
 
 Lets a model request that an external function be run, instead of trying to answer from parameters alone.
 
@@ -291,20 +300,20 @@ User: "What is the ticket price to Tokyo?"
 LLM → Tool Call Request → Your Backend → Python Function → Tool Result → LLM
 ```
 
-Because your backend executes it, you're responsible for validating arguments before running anything the model asked for — treat model-generated arguments like untrusted input, especially for tools that write, delete, spend money, or hit external APIs.
+Because your backend executes it, you're responsible for validating arguments before running anything the model asked for - treat model-generated arguments like untrusted input, especially for tools that write, delete, spend money, or hit external APIs.
 
 ---
 
 ## 10. Tool Calling Workflow
 
-**Call 1** — send system + user message + tool schemas. The model can't answer directly, so it returns a tool call instead of text:
+**Call 1** - send system + user message + tool schemas. The model can't answer directly, so it returns a tool call instead of text:
 
 ```python
 history = []
 # ... system + user message sent with tools=[...]
 ```
 
-Response contains something like `tool_calls: [{name: "get_ticket_price", arguments: '{"city": "Tokyo"}'}]` — arguments arrive as a JSON *string*, so parse it before use.
+Response contains something like `tool_calls: [{name: "get_ticket_price", arguments: '{"city": "Tokyo"}'}]` - arguments arrive as a JSON *string*, so parse it before use.
 
 **Your app intercepts and executes:**
 
@@ -322,7 +331,7 @@ result = get_ticket_price(city)
 history.append({"role": "tool", "tool_call_id": tool_call.id, "content": str(result)})
 ```
 
-**Call 2** — resend the full history (system + user + assistant's tool call + tool result). The model now has what it needs to produce a final natural-language answer.
+**Call 2** - resend the full history (system + user + assistant's tool call + tool result). The model now has what it needs to produce a final natural-language answer.
 
 ```
 User → LLM → Tool needed?
@@ -330,9 +339,9 @@ User → LLM → Tool needed?
               └─ Yes → Tool Request → App → Execute → Result → LLM → Answer
 ```
 
-
+<p align="center">
 <img src="static/s6.png"></img>
-
+</p>
 ---
 
 ## 11. Multiple Tool Calls
@@ -356,12 +365,14 @@ User: "Find the cheapest flight to Tokyo and today's weather there."
           Final Answer
 ```
 
-Your app should execute all requested calls (often in parallel, since they're usually independent) and append each result with its own `tool_call_id` before sending the next request — mismatched IDs are a common source of bugs in multi-tool flows.
+Your app should execute all requested calls (often in parallel, since they're usually independent) and append each result with its own `tool_call_id` before sending the next request - mismatched IDs are a common source of bugs in multi-tool flows.
 
-<img src="static/s8.jpeg"></img>
-<img src="static/s9.jpeg"></img>
+A complete overview of a multiple tool call handling program:
 
----
+<p align="center">
+<img src="static/s8.jpeg" style="width:70%;"></img>
+<img src="static/s9.jpeg" style="width:70%;"></img>
+</p>
 
 ## 12. Function Definition vs Function Execution
 
@@ -379,7 +390,7 @@ Your app should execute all requested calls (often in parallel, since they're us
 }
 ```
 
-It uses the `description` and `parameters` to decide *whether* to call the tool and *what arguments* to supply — description quality directly affects call accuracy, so vague descriptions produce vague/wrong tool usage.
+It uses the `description` and `parameters` to decide *whether* to call the tool and *what arguments* to supply - description quality directly affects call accuracy, so vague descriptions produce vague/wrong tool usage.
 
 **What it does NOT receive:** the actual function body. Implementation stays server-side.
 
@@ -391,16 +402,17 @@ LLM → Tool Schema → Tool Call Request → Your Backend → Actual Code → R
 
 ## 13. Agentic AI
 
+<p align="center">
 <img src="static/s7.png"></img>
+</p>
 
-
-**Definition:** a system where the LLM decides what action to take next, observes the result, and decides the next action — repeated until the goal is met.
+**Definition:** a system where the LLM decides what action to take next, observes the result, and decides the next action - repeated until the goal is met.
 
 ```
 Goal → LLM → Choose Action → Tool → Observe Result → LLM → Next Action → ... → Done
 ```
 
-> An agent runs tools in a loop to achieve a goal — the loop is the defining feature, not the presence of an LLM.
+> An agent runs tools in a loop to achieve a goal - the loop is the defining feature, not the presence of an LLM.
 
 **Core components:**
 
@@ -467,7 +479,7 @@ while not goal_completed:
         return response
 ```
 
-**Safety controls — never let an agent loop unbounded:**
+**Safety controls - never let an agent loop unbounded:**
 
 ```
 MAX_STEPS
@@ -481,7 +493,7 @@ ERROR_HANDLING (retries, fallback, graceful failure message)
 MAX_STEPS = 10
 ```
 
-In production, also log every tool call/result pair — agent loops are hard to debug after the fact without a full trace of what was called, with what arguments, and what came back.
+In production, also log every tool call/result pair - agent loops are hard to debug after the fact without a full trace of what was called, with what arguments, and what came back.
 
 ---
 
@@ -494,13 +506,13 @@ In production, also log every tool call/result pair — agent loops are hard to 
 | LiteLLM | One interface, many providers |
 | LangChain | Framework for building LLM apps (prompts, chains, retrieval, agents) |
 | Token | Smallest unit the model processes |
-| Prompt/Completion Tokens | Sent vs generated — billed differently |
+| Prompt/Completion Tokens | Sent vs generated - billed differently |
 | Context Window | Max tokens per request (input + output) |
 | Prompt Caching | Reuse static prefix content to cut cost/latency |
 | Gradio | Fast Python-only UI for demos, not production hosting |
 | Streaming | Progressive token delivery, better perceived latency |
 | Tool Calling | Model requests a function; app executes it |
-| Tool Definition | Schema only — no code sent to the model |
+| Tool Definition | Schema only - no code sent to the model |
 | Tool Execution | Always happens in your backend |
 | Agent | LLM + tools + loop + goal |
 | Memory | State persisted across agent steps |
