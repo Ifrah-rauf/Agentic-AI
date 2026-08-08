@@ -429,9 +429,8 @@ Goal → LLM → Choose Action → Tool → Observe Result → LLM → Next Acti
 | Orchestration | Deciding which action/node runs next |
 | Autonomy | Choosing subsequent actions dynamically, not following a fixed script |
 
----
 
-## 14. LLM vs LLM Agent
+## Bonus: LLM vs LLM Agent
 
 | LLM | Agent |
 |---|---|
@@ -449,59 +448,8 @@ Agent: `"Weather in Delhi?"` → calls weather tool → receives data → `"Delh
 
 The distinguishing factor is the **action + feedback loop**, not merely that an LLM is involved.
 
----
 
-## 15. Multi-Tool / Agent Workflow
-
-```
-                 User Goal
-                    │
-                   LLM
-          ┌─────────┼─────────┐
-       Search    Database   Calculator
-          └─────────┼─────────┘
-                  Results
-                    │
-                   LLM
-                    │
-             Need another step?
-               Yes │    │ No
-                   LLM  Final Answer
-```
-
-**Agent loop (pseudocode):**
-
-```python
-while not goal_completed:
-    response = llm(messages=history, tools=tools)
-
-    if response.tool_call:
-        result = execute_tool(response.tool_call)
-        history.append(response)
-        history.append(result)
-    else:
-        return response
-```
-
-**Safety controls - never let an agent loop unbounded:**
-
-```
-MAX_STEPS
-MAX_TOOL_CALLS
-TIMEOUT
-TOKEN_LIMIT
-ERROR_HANDLING (retries, fallback, graceful failure message)
-```
-
-```python
-MAX_STEPS = 10
-```
-
-In production, also log every tool call/result pair - agent loops are hard to debug after the fact without a full trace of what was called, with what arguments, and what came back.
-
----
-
-## 16. Summary
+## 15. Summary
 
 | Concept | Remember |
 |---|---|
@@ -525,7 +473,6 @@ In production, also log every tool call/result pair - agent loops are hard to de
 | Autonomy | Agent picks next actions itself |
 | Multi-Tool Agent | Coordinates several tools per task |
 
----
 
 ## Mental Model
 
