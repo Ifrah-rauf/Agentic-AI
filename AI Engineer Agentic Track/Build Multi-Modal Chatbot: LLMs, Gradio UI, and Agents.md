@@ -358,8 +358,8 @@ User: "Find the cheapest flight to Tokyo and today's weather there."
 
 Your app should execute all requested calls (often in parallel, since they're usually independent) and append each result with its own `tool_call_id` before sending the next request — mismatched IDs are a common source of bugs in multi-tool flows.
 
-<img src="static/s8.png"></img>
-<img src="static/s9.png"></img>
+<img src="static/s8.jpeg"></img>
+<img src="static/s9.jpeg"></img>
 
 ---
 
