@@ -307,6 +307,11 @@ Because your backend executes it, you're responsible for validating arguments be
 
 ## 10. Tool Calling Workflow
 
+<p align="center">
+<img src="static/s8.jpeg" style="width:70%;"></img>
+<img src="static/s9.jpeg" style="width:70%;"></img>
+</p>
+
 **Call 1** - send system + user message + tool schemas. The model can't answer directly, so it returns a tool call instead of text:
 
 ```python
@@ -368,10 +373,9 @@ User: "Find the cheapest flight to Tokyo and today's weather there."
 
 Your app should execute all requested calls (often in parallel, since they're usually independent) and append each result with its own `tool_call_id` before sending the next request - mismatched IDs are a common source of bugs in multi-tool flows.
 
-A complete overview of a multiple tool call handling program:
+**A complete overview of a multiple tool call handling program:**
 
 <p align="center">
-<img src="static/s8.jpeg" style="width:70%;"></img>
 <img src="static/s9.jpeg" style="width:70%;"></img>
 </p>
 
