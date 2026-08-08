@@ -309,7 +309,6 @@ Because your backend executes it, you're responsible for validating arguments be
 
 <p align="center">
 <img src="static/s8.jpeg" style="width:70%;"></img>
-<img src="static/s9.jpeg" style="width:70%;"></img>
 </p>
 
 **Call 1** - send system + user message + tool schemas. The model can't answer directly, so it returns a tool call instead of text:
