@@ -127,9 +127,6 @@ Application → LangChain → LiteLLM → LLM Provider
 ---
 
 ## 4. Tokens, Usage & API Cost
-<p align="center">
-<img src="static/s2.png"></img>
-</p>
 
 A model never sees raw words - text is tokenized first.
 
@@ -175,9 +172,6 @@ for token_id in tokens:
 Measured in tokens, not characters or words. Exceeding it either truncates silently (bad) or throws an error, depending on the API - always check remaining budget before appending large tool results or documents.
 
 ---
-<p align="center">
-<img src="static/s3.png"></img>
-</p>
 
 ## 5. Prompt Caching
 
@@ -210,6 +204,10 @@ Static documentation...       Current time: 10:31
 
 Caching is most valuable in RAG apps, coding assistants with large repo context, and any system reusing a big fixed instruction block across many calls.
 
+<p align="center">
+<img src="static/s2.png"></img>
+</p>
+
 ---
 
 ## 6. LLM Knowledge vs AI Products
@@ -227,6 +225,9 @@ A product wraps the model with capabilities the model doesn't have on its own:
 ```
 LLM + Search + Tools + Memory + External Data
 ```
+<p align="center">
+<img src="static/s3.png"></img>
+</p>
 
 **Why this matters practically:** `Model ≠ AI Product`. A model's raw knowledge is frozen at training time; a product stays current by bolting on retrieval, tools, and memory around it - none of which require retraining the base model. When evaluating "is this model good," separate what's the base model's capability from what's the surrounding product engineering.
 
